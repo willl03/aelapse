@@ -4,8 +4,11 @@
 
 > [!NOTE]
 > This fork/branch supports building the .clap format
+> 
 > I have not tried to build other formats with the modified CMakeLists.txt
+> 
 > See instructions below for building .clap instructions
+> 
 > All credits to smiarx, amazing spring reverb on Linux 🙏
 
 ÆLAPSE
@@ -23,6 +26,8 @@ tones to dreamy synth pads, as well as dub-style snare sounds.
 ## Downloads
 
 The plugin is available in VST, AU and LV2 format on smiarx's [release page](https://github.com/smiarx/aelapse/releases)
+
+The plugin is available in .clap format on my fork's [release page](https://github.com/willl03/aelapse/releases)
 
 ## Building .clap format
 1. Install dependencies
