@@ -11,7 +11,7 @@ set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_RELEASE TRUE)
 
 find_package(JUCE CONFIG QUIET)
 if(NOT ${JUCE_FOUND})
-    Include(FetchContent)
+    include(FetchContent)
 
     FetchContent_Declare(
       JUCE
@@ -19,6 +19,21 @@ if(NOT ${JUCE_FOUND})
       GIT_TAG        7.0.12
     )
     FetchContent_MakeAvailable(JUCE)
+endif()
+
+# -----------------------------------------------------------------------------
+# CLAP Extensions: Load local submodule if present, otherwise fetch via Git
+# -----------------------------------------------------------------------------
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/libs/clap-juce-extensions/CMakeLists.txt")
+    add_subdirectory(libs/clap-juce-extensions EXCLUDE_FROM_ALL)
+else()
+    include(FetchContent)
+    FetchContent_Declare(
+      clap-juce-extensions
+      GIT_REPOSITORY https://github.com/free-audio/clap-juce-extensions.git
+      GIT_TAG        main
+    )
+    FetchContent_MakeAvailable(clap-juce-extensions)
 endif()
 
 set(JUCE_FORMATS VST3 AU)
@@ -43,6 +58,15 @@ juce_add_plugin(${PROJECT_NAME}
     FORMATS VST3 ${JUCE_FORMATS}
     PRODUCT_NAME "${PROJECT_NAME}")
 
+# -----------------------------------------------------------------------------
+# Register the CLAP target
+# -----------------------------------------------------------------------------
+clap_juce_extensions_plugin(
+    TARGET ${PROJECT_NAME}
+    CLAP_ID "com.s-audio.aelapse"
+    CLAP_FEATURES "audio-effect" "delay" "reverb"
+)
+
 # tests
 include(CTest)
 option(BUILD_TESTING "Build tests" ON)
@@ -50,7 +74,7 @@ if (BUILD_TESTING)
    enable_testing()
 endif()
 
-# set dsp options itnernally
+# set dsp options internally
 set(DSP_SPRINGS_RMS ON CACHE INTERNAL "")
 set(DSP_SPRINGS_SHAKE ON CACHE INTERNAL "")
 set(DSP_TAPEDELAY_SWITCH_INDICATOR ON CACHE INTERNAL "")
@@ -74,7 +98,7 @@ target_compile_definitions(${PROJECT_NAME}
 
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
 
-#ignore omp simd pragma
+# ignore omp simd pragma
 if(MSVC)
     target_compile_options(${PROJECT_NAME} PRIVATE
         /openmp

@@ -2,6 +2,12 @@
 
 ![A screenshot of the Ælapse plugin](images/screenshot.png)
 
+> [!NOTE]
+> This fork/branch supports building the .clap format
+> I have not tried to build other formats with the modified CMakeLists.txt
+> See instructions below for building .clap instructions
+> All credits to smiarx, amazing spring reverb on Linux 🙏
+
 ÆLAPSE
 =====
 
@@ -16,40 +22,44 @@ tones to dreamy synth pads, as well as dub-style snare sounds.
 
 ## Downloads
 
-The plugin is available in VST, AU and LV2 format on the [release page](https://github.com/smiarx/aelapse/releases)
+The plugin is available in VST, AU and LV2 format on smiarx's [release page](https://github.com/smiarx/aelapse/releases)
 
-## Building
+## Building .clap format
+1. Install dependencies
+```
+sudo apt update
+sudo apt install -y \
+  libx11-dev \
+  libxrandr-dev \
+  libxinerama-dev \
+  libxcursor-dev \
+  libgl1-mesa-dev \
+  libfreetype-dev \
+  libfontconfig1-dev \
+  libasound2-dev \
+  libxml2-utils
+  ```
 
-To build ÆLAPSE, you need CMake:
-
-```bash
-# Clone the repository and update submodules
-$ git clone https://github.com/smiarx/aelapse.git
-$ cd aelapse
-$ git submodule update --init --recursive
-
-# build
-$ cmake -Bbuild -DCMAKE_BUILD_TYPE=Release .
-$ cmake --build build --config Release --parallel 4
+2. Add clap-juice-extensions submodule
+```
+git submodule add https://github.com/free-audio/clap-juce-extensions.git libs/clap-juce-extensions
+git submodule update --init --recursive
 ```
 
-VST will be located in `build/Aelapse_artifacts/Release`.
-
-On x86, you can enable the `DSP_X86_DISPATCH` option. This will compile the
-audio section of the plugin for different architectures and select the
-available one at runtime.
-
-```bash
-# build
-$ cmake -Bbuild -DDSP_X86_DISPATCH=1 -DCMAKE_BUILD_TYPE=Release .
-$ cmake --build build --config Release --parallel 4
+3. Configure the Release build tree
+```
+cmake -B build -DCMAKE_BUILD_TYPE=Release
 ```
 
-You can also build with `-march=native` to build specifically for you machine.
+4. Compile the CLAP target using all CPU cores
+```
+cmake --build build --config Release --target Aelapse_CLAP -j$(nproc)
+```
 
-```bash
-$ cmake -Bbuild -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="-march=native" .
-$ cmake --build build --config Release --parallel 4
+5. Create ~/.clap directory and install the binary
+```
+mkdir -p ~/.clap
+cp -r $(find build -name "Aelapse.clap" -o -name "aelapse.clap") ~/.clap/
 ```
 
 ## Fonts
